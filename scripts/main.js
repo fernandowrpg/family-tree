@@ -17,23 +17,38 @@ async function editFamily(actor) {
   const d = getData(actor);
   const kids = childrenOf(actor.id).map(a => a.id);
   const others = game.actors.filter(a => a.id !== actor.id).sort((a, b) => a.name.localeCompare(b.name));
-  const sel = (name, chosen) => `<select name="${name}" multiple size="6">${others
-    .map(a => `<option value="${a.id}" ${chosen.includes(a.id) ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select>`;
+  const chip = a => `<span class="ft-chip" data-id="${a.id}"><img src="${esc(a.img)}">${esc(a.name)}<a class="ft-x">&times;</a></span>`;
+  const field = (name, label, chosen) => `<fieldset class="ft-field" data-name="${name}"><legend>${label}</legend>
+    <div class="ft-chips">${chosen.map(i => game.actors.get(i)).filter(Boolean).map(chip).join("")}</div>
+    <select class="ft-add"><option value="">+ Adicionar...</option>${others
+      .map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></fieldset>`;
   const content = `<div class="ft-form">
-    <label>Pais</label>${sel("parents", d.parents)}
-    <label>Cônjuges</label>${sel("spouses", d.spouses)}
-    <label>Filhos</label>${sel("children", kids)}
-    <label>Notas</label><textarea name="notes" rows="3">${esc(d.notes)}</textarea>
-    <p class="hint">Ctrl+clique para selecionar vários.</p></div>`;
+    ${field("parents", "Pais", d.parents)}
+    ${field("spouses", "Cônjuges", d.spouses)}
+    ${field("children", "Filhos", kids)}
+    <label>Notas</label><textarea name="notes" rows="3">${esc(d.notes)}</textarea></div>`;
 
   const res = await foundry.applications.api.DialogV2.prompt({
     window: { title: `Família: ${actor.name}` },
+    position: { width: 420 },
     content,
+    render: (ev, dialog) => {
+      const root = dialog?.element ?? ev?.target?.element;
+      root?.querySelectorAll(".ft-field").forEach(fs => {
+        const chips = fs.querySelector(".ft-chips");
+        fs.querySelector(".ft-add").addEventListener("change", e => {
+          const a = game.actors.get(e.target.value);
+          if (a && !chips.querySelector(`[data-id="${a.id}"]`)) chips.insertAdjacentHTML("beforeend", chip(a));
+          e.target.value = "";
+        });
+        chips.addEventListener("click", e => e.target.closest(".ft-x")?.parentElement.remove());
+      });
+    },
     ok: {
       label: "Salvar",
       callback: (ev, btn) => {
         const f = btn.form;
-        const vals = n => [...f.elements[n].selectedOptions].map(o => o.value);
+        const vals = n => [...f.querySelectorAll(`.ft-field[data-name="${n}"] .ft-chip`)].map(c => c.dataset.id);
         return { parents: vals("parents"), spouses: vals("spouses"), children: vals("children"), notes: f.elements.notes.value };
       }
     },
