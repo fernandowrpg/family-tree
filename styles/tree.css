@@ -1,0 +1,15 @@
+.ft-canvas{position:relative;overflow:auto;height:100%;padding:20px}
+.ft-canvas svg{position:absolute;left:0;top:0;pointer-events:none}
+.ft-canvas path{fill:none;stroke:var(--color-text-secondary,#888);stroke-width:2}
+.ft-canvas path.spouse{stroke:#c9a14a;stroke-dasharray:4 3}
+.ft-row{display:flex;justify-content:center;gap:40px;margin-bottom:70px;width:max-content;min-width:100%}
+.ft-node{position:relative;z-index:1;width:110px;text-align:center;cursor:pointer;padding:6px;border-radius:8px;background:var(--color-cool-5,#222a);border:1px solid var(--color-border,#666)}
+.ft-node:hover{border-color:#c9a14a}
+.ft-node img{width:64px;height:64px;object-fit:cover;border-radius:50%;border:none}
+.ft-node span{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ft-tip{position:absolute;z-index:10;display:none;max-width:260px;padding:8px;border-radius:6px;background:#111e;color:#eee;font-size:12px;pointer-events:none}
+.ft-tip img{float:left;width:48px;height:48px;margin-right:8px;border-radius:4px}
+.ft-tip b{font-size:14px}
+.ft-bar{display:flex;gap:8px;padding:6px 20px;align-items:center}
+.ft-form label{font-weight:bold;display:block;margin-top:6px}
+.ft-form select,.ft-form textarea{width:100%}
